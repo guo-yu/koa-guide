@@ -83,6 +83,26 @@ app.listen(3000);
 ````
 在上方的范例代码中，中间件以此被执行的顺序已经在注释中标记出来。你也可以自己尝试运行一下这个范例，并打印记录下各个环节的输出与耗时。
 
+#### 为什么是级联？（译者注）
+
+「级联」这个词许多人也许在 CSS 中听说过，如果你不能理解为什么在这里使用这个词，可以将这种路由结构想象成 LESS 的继承嵌套书写方式：
+
+````
+.middleware1 {
+  // (1) do some stuff
+  .middleware2 {
+    // (2) do some other stuff
+    .middleware3 {
+      // (3) NO next yield !
+      // this.body = 'hello world'
+    }
+    // (4) do some other stuff later
+  }
+  // (5) do some stuff lastest and return
+}
+````
+上方的伪代码中标注了中间件的执行顺序，看起来是不是有点像 ruby 执行代码块（block）时 yield 的表现了？也许这能帮助你更好的理解 koa 运作的方式。
+
 ### 应用配置（Settings）
 
 应用的配置是 app 实例的属性。目前来说，Koa 的配置项如下：
