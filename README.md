@@ -45,7 +45,7 @@ Koa 中间件以一种非常传统的方式级联起来，所以你可能会非�
 
 下边这个例子展现了使用这一特殊方法书写的 Hello World 范例：一开始，用户的请求通过 x-response-time 中间件和 logging 中间件，这两个中间件记录了一些请求细节，然后「穿过」 response 中间件数次，最终，再运行到 response，结束请求，返回 「Hello World」。
 
-当程序运行到 `yield next` 时，代码流会暂停执行这个中间件的剩余代码，转而切换到下一个被定义的中间件执行代码，这样切换流的方式，被称为 
+当程序运行到 `yield next` 时，代码流会暂停执行这个中间件的剩余代码，转而切换到下一个被定义的中间件执行代码，这样切换流的方式，被称为
 downstream，当没有下一个中间件执行 downstream 的时候，代码会恢复正常的方式被执行。
 
 ````javascript
@@ -89,6 +89,23 @@ app.listen(3000);
 - app.subdomainOffset 被忽略的 `.subdomains` 列表(?) [2]
 - app.jsonSpaces 默认的 JSON 响应空间(?) [2]
 - app.outputErrors 是否输出错误堆栈（`err.stack`）到 `stderr` [当执行环境是 `"test"` 的时候为 `false`]
+
+### 中间件（Middleware）
+* [koa-router](https://github.com/alexmingoia/koa-router)
+* [trie-router](https://github.com/koajs/trie-router)
+* [route](https://github.com/koajs/route)
+* [basic-auth](https://github.com/koajs/basic-auth)
+* [etag](https://github.com/koajs/etag)
+* [compose](https://github.com/koajs/compose)
+* [static](https://github.com/koajs/static)
+* [static-cache](https://github.com/koajs/static-cache)
+* [session](https://github.com/koajs/session)
+* [compress](https://github.com/koajs/compress)
+* [csrf](https://github.com/koajs/csrf)
+* [logger](https://github.com/koajs/logger)
+* [mount](https://github.com/koajs/mount)
+* [send](https://github.com/koajs/send)
+* [error](https://github.com/koajs/error)
 
 ### 常用方法
 
