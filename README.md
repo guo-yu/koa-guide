@@ -41,43 +41,47 @@ app.listen(3000);
 
 ### 编写级联代码（Cascading）
 
-Koa 中间件以一种非常传统的方式级联起来，所以你可能会非常熟悉这种写法。在以往的 Node 开发中，频繁使用回调不太便于表达代码逻辑的表现力，而在 Koa 中，我们可以写出真正具有表现力的中间件。与 Connect 实现中间件的方法想对比，Koa 的做法不会简单的将控制权移交给一个又一个的中间件直到程序返回，Koa 执行 downstream 协程，然后返回到 upstream 继续执行代码（?）。
+Koa 中间件以一种非常传统的方式级联起来，所以你可能会非常熟悉这种写法。在以往的 Node 开发中，频繁使用回调不太便于表达代码逻辑的表现力，而在 Koa 中，我们可以写出真正具有表现力的中间件。与 Connect 实现中间件的方法想对比，Koa 的做法不会简单的将控制权移交给一个又一个的中间件直到程序返回，Koa 执行代码的方式有点像回形针，用户请求通过中间件时，遇到 `yield next` 关键词时，会被传递到下一个符合请求的路由（downstream），在 `yield next` 捕获不到下一个中间件时，逆序返回继续执行代码（upstream）。
 
-下边这个例子展现了使用这一特殊方法书写的 Hello World 范例：一开始，用户的请求通过 x-response-time 中间件和 logging 中间件，这两个中间件记录了一些请求细节，然后「穿过」 response 中间件数次，最终，再运行到 response，结束请求，返回 「Hello World」。
+下边这个例子展现了使用这一特殊方法书写的 Hello World 范例：一开始，用户的请求通过 x-response-time 中间件和 logging 中间件，这两个中间件记录了一些请求细节，然后「穿过」 response 中间件一次，最终结束请求，返回 「Hello World」。
 
-当程序运行到 `yield next` 时，代码流会暂停执行这个中间件的剩余代码，转而切换到下一个被定义的中间件执行代码，这样切换流的方式，被称为 
-downstream，当没有下一个中间件执行 downstream 的时候，代码会恢复正常的方式被执行。
+当程序运行到 `yield next` 时，代码流会暂停执行这个中间件的剩余代码，转而切换到下一个被定义的中间件执行代码，这样切换控制权的方式，被称为 
+downstream，当没有下一个中间件执行 downstream 的时候，代码将会逆序执行。
 
 ````javascript
 var koa = require('koa');
 var app = koa();
 
 // x-response-time
-
 app.use(function *(next){
+  // (1) 进入路由
   var start = new Date;
   yield next;
+  // (5) 再次进入 x-response-time 中间件，记录2次通过此中间件「穿越」的时间
   var ms = new Date - start;
   this.set('X-Response-Time', ms + 'ms');
+  // (6) 返回 this.body
 });
 
 // logger
-
 app.use(function *(next){
+  // (2) 进入 logger 中间件
   var start = new Date;
   yield next;
+  // (4) 再次进入 logger 中间件，记录2次通过此中间件「穿越」的时间
   var ms = new Date - start;
   console.log('%s %s - %s', this.method, this.url, ms);
 });
 
 // response
-
 app.use(function *(){
+  // (3) 进入 response 中间件，没有捕获到下一个符合条件的中间件，传递到 upstream
   this.body = 'Hello World';
 });
 
 app.listen(3000);
 ````
+在上方的范例代码中，中间件以此被执行的顺序已经在注释中标记出来。你也可以自己尝试运行一下这个范例，并打印记录下各个环节的输出与耗时。
 
 ### 应用配置（Settings）
 
