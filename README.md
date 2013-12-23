@@ -1,6 +1,4 @@
-## koa-guide
-
-## koa 中文文档
+## koa 中文文档 koa guide in Chinese
 
 koa: 下一代 Node.js web 框架
 
@@ -124,7 +122,267 @@ this.cookies.set('name', 'tobi', { signed: true });
 
 ### 错误处理（Error Handling）
 
+除非应用执行环境被配置为 `"test"`，Koa 都将会将所有错误信息输出到 stderr，和 Connect 一样，你可以自己定义一个「错误事件」来监听 Koa app 中发生的错误：
+
+````javascript
+app.on('error', function(err){
+  log.error('server error', err);
+});
+````
+
+当任何 req 或者 res 中出现的错误无法被回应到客户端时，Koa 会在第二个参数传入这个错误的上下文：
+
+````javascript
+app.on('error', function(err, ctx){
+  log.error('server error', err, ctx);
+});
+````
+
+如果任何错误有可能被回应到客户端，比如当没有新数据写入 socket 时，Koa 会默认返回一个 500 错误，并抛出一个 app 级别的错误到日志处理中间件中。
+
 ### 应用的上下文（Context）
+
+Koa 的上下文封装了 request 与 response 对象至一个对象中，并提供了一些帮助开发者编写业务逻辑的方法。为了方便，你可以在 `ctx.request` 和 `ctx.response` 中访问到这些方法。
+
+每一个请求都会创建一段上下文。在控制业务逻辑的中间件中，上下文被寄存在 `this` 对象中，你可以这样访问：
+
+````javascript
+app.use(function *(){
+  this; // 上下文对象
+  this.request; // Request 对象
+  this.response; // Response 对象
+});
+````
+
+#### Request 对象
+
+ctx.request 对象包括以下属性和别名方法，详见 [Request](#request) 章节
+
+- ctx.header
+- ctx.method
+- ctx.method=
+- ctx.url
+- ctx.url=
+- ctx.path
+- ctx.path=
+- ctx.query
+- ctx.query=
+- ctx.querystring
+- ctx.querystring=
+- ctx.length
+- ctx.host
+- ctx.fresh
+- ctx.stale
+- ctx.socket
+- ctx.protocol
+- ctx.secure
+- ctx.ip
+- ctx.ips
+- ctx.subdomains
+- ctx.is()
+- ctx.accepts()
+- ctx.acceptsEncodings()
+- ctx.acceptsCharsets()
+- ctx.acceptsLanguages()
+- ctx.get()
+
+#### Response 对象
+
+ctx.response 对象包括以下属性和别名方法，详见 [Response](#response) 章节
+
+- ctx.body
+- ctx.body=
+- ctx.status
+- ctx.status=
+- ctx.length=
+- ctx.type
+- ctx.type=
+- ctx.headerSent
+- ctx.redirect()
+- ctx.attachment()
+- ctx.set()
+- ctx.remove()
+- ctx.lastModified=
+- ctx.etag=
+
+#### 上下文对象中的其他 API
+
+- ctx.req: Node.js 中的 request 对象
+- ctx.res: Node.js 中的 response 对象
+- ctx.app: app 实例
+- ctx.cookies.get(name, [options]) 对于给定的 name ，返回响应的 cookie
+- ctx.cookies.set(name, value, [options]) 对于给定的参数，设置一个新 cookie
+    - options
+        * `signed`
+        * `expires`
+        * `path`
+        * `domain`
+        * `secure`
+        * `httpOnly`
+- ctx.throw(msg, [status]) 抛出常规错误的辅助方法，以下几种写法都有效：
+````javascript
+this.throw(403)
+this.throw('name required', 400)
+this.throw(400, 'name required')
+this.throw('something exploded')
+````
+实际上，ctx.throw 是这些代码片段的简写方法：
+
+````javascript
+var err = new Error('name required');
+err.status = 400;
+throw err;
+````
+需要注意的是，ctx.throw 创建的错误，均为用户级别错误（标记为err.expose），会被返回到客户端。
+
+### Request
+
+`ctx.request` 对象是对 Node 原生请求对象的抽象包装，提供了一些非常有用的方法。详细的 Request 对象 API 如下：
+
+#### req.header
+
+#### req.method
+
+#### req.method=
+
+设置 req.method ，用于实现输入 methodOverride() 的中间件
+
+#### req.length
+
+返回 req 对象的 `Content-Length` (Number)
+
+#### req.url
+
+#### req.url=
+
+#### req.path
+
+#### req.path=
+
+#### req.querystring
+
+返回类似 Express 中 req.query 查询字符串，去除了头部的 `'?'`
+
+#### req.querystring=
+
+#### req.search
+
+返回类似 Express 中 req.query 查询字符串，包含了头部的 `'?'`
+
+#### req.search=
+
+#### req.host
+
+#### req.type
+
+返回 req 对象的 `Content-Type`
+
+#### req.query
+
+返回经过解析的查询字符串，类似 Express 中的 req.query
+
+#### req.query=
+
+#### req.fresh
+
+检查 req 的缓存是否是最新。当缓存为最新时，可编写业务逻辑直接返回 `304`
+
+#### req.stale
+
+和 req.fresh 返回的结果正好相反
+
+#### req.protocol
+
+#### req.secure
+
+#### req.ip
+
+#### req.ips
+
+#### req.subdomains
+
+返回 req 对象中的子域名数组。
+
+#### req.is(type)
+
+判断 req 对象中 Content-Type 是否为给定 type 的快捷方法：
+
+````javascript
+// With Content-Type: text/html; charset=utf-8
+this.is('html'); // => 'html'
+this.is('text/html'); // => 'text/html'
+this.is('text/*', 'text/html'); // => 'text/html'
+
+// When Content-Type is application/json
+this.is('json', 'urlencoded'); // => 'json'
+this.is('application/json'); // => 'application/json'
+this.is('html', 'application/*'); // => 'application/json'
+
+this.is('html'); // => false
+````
+
+#### req.accepts(type)
+
+判断 req 对象中 Accept 是否为给定 type 的快捷方法：
+
+````javascript
+// Accept: text/html
+this.accepts('html');
+// => "html"
+
+// Accept: text/*, application/json
+this.accepts('html');
+// => "html"
+this.accepts('text/html');
+// => "text/html"
+this.accepts('json', 'text');
+// => "json"
+this.accepts('application/json');
+// => "application/json"
+
+// Accept: text/*, application/json
+this.accepts('image/png');
+this.accepts('png');
+// => undefined
+
+// Accept: text/*;q=.5, application/json
+this.accepts(['html', 'json']);
+this.accepts('html', 'json');
+// => "json"
+````
+
+#### req.acceptsEncodings(encodings)
+
+判断客户端是否接受给定的编码方式的快捷方法，当有传入参数时，返回最应当返回的一种编码方式
+
+````javascript
+// Accept-Encoding: gzip
+this.acceptsEncodings('gzip', 'deflate');
+// => "gzip"
+
+this.acceptsEncodings(['gzip', 'deflate']);
+// => "gzip"
+````
+
+当没有传入参数时，返回客户端的请求数组：
+
+````javascript
+// Accept-Encoding: gzip, deflate
+this.acceptsEncodings();
+// => ["gzip", "deflate"]
+````
+
+#### req.acceptsCharsets(charsets)
+
+使用方法同 req.acceptsEncodings(encodings)
+
+#### req.acceptsLanguages(langs)
+
+使用方法同 req.acceptsEncodings(encodings)
+
+### Response
+
+详细的 Response 对象 API
 
 ### Contributing
 - Fork this repo
