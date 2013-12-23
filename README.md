@@ -1,10 +1,26 @@
-## koa 中文文档 koa guide in Chinese
+## koa 中文文档
 
 koa: 下一代 Node.js web 框架
 
 ### koa 简介
 
 由 Express 原班人马打造的 koa，致力于成为一个更小、更健壮、更富有表现力的 Web 框架。通过组合不同的 generator，使用 koa 编写 web 应用，可以免除重复且繁琐的回调，并极大地提升常用错误处理的效率。Koa 不会绑定任何中间件在内核方法中，它仅仅提供了一个轻量优雅的函数库，使得编写 Web 应用变得得心应手。
+
+### 安装 koa
+
+koa 依赖支持 generator 的 Node 环境，准确来说，是 `node >= 0.11.9` 的环境。
+
+````
+$ npm install koa
+````
+
+安装完成后，确保使用 `$ node app.js --harmony` 即，harmony 模式运行程序。
+
+为了方便，你可以将 node 设置为默认启动 harmony 模式的别名：
+
+````
+alias node='node --harmony'
+````
 
 ### 应用（Application）
 
@@ -220,12 +236,14 @@ ctx.response 对象包括以下属性和别名方法，详见 [Response](#respon
         * `secure`
         * `httpOnly`
 - ctx.throw(msg, [status]) 抛出常规错误的辅助方法，以下几种写法都有效：
+
 ````javascript
 this.throw(403)
 this.throw('name required', 400)
 this.throw(400, 'name required')
 this.throw('something exploded')
 ````
+
 实际上，ctx.throw 是这些代码片段的简写方法：
 
 ````javascript
@@ -233,6 +251,7 @@ var err = new Error('name required');
 err.status = 400;
 throw err;
 ````
+
 需要注意的是，ctx.throw 创建的错误，均为用户级别错误（标记为err.expose），会被返回到客户端。
 
 ### Request
@@ -383,6 +402,37 @@ this.acceptsEncodings();
 ### Response
 
 详细的 Response 对象 API
+
+### 性能（Benchmarks）
+
+挂载不同数量的中间件，wrk 得出 benchmarks 如下：
+
+````
+1 middleware
+8367.03
+
+5 middleware
+8074.10
+
+10 middleware
+7526.55
+
+15 middleware
+7399.92
+
+20 middleware
+7055.33
+
+30 middleware
+6460.17
+
+50 middleware
+5671.98
+
+100 middleware
+4349.37
+````
+一般来说，我们通常要使用约50个中间件，按这个标准计算，单应用可支持 340,260 请求/分钟，即 20,415,600 请求/小时，也就是约 4.4 亿 请求/天。
 
 ### Contributing
 - Fork this repo
