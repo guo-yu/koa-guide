@@ -1,6 +1,6 @@
-## koa 中文文档
+## ![koa](http://ww4.sinaimg.cn/large/61ff0de3gw1ebtqstxfuvj202g01awea.jpg) 中文文档
 
-koa: 下一代 Node.js web 框架
+Koa，下一代 Node.js web 框架
 
 ### koa 简介
 
