@@ -648,7 +648,7 @@ this.acceptsEncodings();
 
 #### res.get(field)
 
-Get a response header field value with case-insensitive field.
+获取指定的返回头属性，属性名称区分大小写。
 
 ````javascript
 var etag = this.get('ETag');
@@ -656,7 +656,7 @@ var etag = this.get('ETag');
 
 #### res.set(field, value)
 
-Set response header field to value:
+使用给定的参数设置一个返回头属性：
 
 ````javascript
 this.set('Cache-Control', 'no-cache');
@@ -664,7 +664,7 @@ this.set('Cache-Control', 'no-cache');
 
 #### res.set(fields)
 
-Set several response header fields with an object:
+使用给定的对象一次设置多个返回头属性：
 
 ````javascript
 this.set({
@@ -675,11 +675,11 @@ this.set({
 
 #### res.remove(fields)
 
-Remove header field.
+删除指定的返回头属性
 
 #### res.type
 
-Get response Content-Type void of parameters such as "charset".
+获取返回头中的 Content-Type，不包括 `"charset"` 等属性。
 
 ````javascript
 var ct = this.type;
@@ -688,7 +688,7 @@ var ct = this.type;
 
 #### res.type=
 
-Set response Content-Type via mime string or file extension.
+使用字符串或者文件后缀设定返回的 Content-Type 
 
 ````javascript
 this.type = 'text/plain; charset=utf-8';
@@ -697,13 +697,11 @@ this.type = '.png';
 this.type = 'png';
 ````
 
-Note: when appropriate a charset is selected for you, for example res.type = 'html' will default to "utf-8", however when explicitly defined in full as res.type = 'text/html' no charset is assigned.
+注意：当使用文件后缀指定时，koa 会默认设置好最匹配的编码字符集，比如当设定 `res.type = 'html'` 时，koa 会默认使用 `"utf-8"` 字符集。但当明确使用 `res.type = 'text/html'` 指定时，koa 不会自动设定字符集。
 
 #### res.redirect(url, [alt])
 
-Perform a [302] redirect to url.
-
-The string "back" is special-cased to provide Referrer support, when Referrer is not present alt or "/" is used.
+返回一个 303 跳转到给定的 url，您也可以使用关键词 `back` 来跳转到该 url 的上一个页面（refer），当没有上一个页面时，默认会跳转到 '/'
 
 ````javascript
 this.redirect('back');
@@ -711,8 +709,7 @@ this.redirect('back', '/index.html');
 this.redirect('/login');
 this.redirect('http://google.com');
 ````
-
-To alter the default status of 302, simply assign the status before or after this call. To alter the body, assign it after this call:
+如果你需要覆盖 302 状态码，并在跳转时返回一些文案，可以这样做：
 
 ````javascript
 this.status = 301;
@@ -722,19 +719,19 @@ this.body = 'Redirecting to shopping cart';
 
 #### res.attachment([filename])
 
-Set Content-Disposition to "attachment" to signal the client to prompt for download. Optionally specify the filename of the download.
+设置返回熟悉 Content-Disposition 为 `"attachment"`，并告知客户端进行下载。
 
 #### res.headerSent
 
-Check if a response header has already been sent. Useful for seeing if the client may be notified on error.
+判断一个响应头是否已经发送到客户端，通常用来检测客户端是否收到了错误信息。
 
 #### res.lastModified
 
-Return the Last-Modified header as a Date, if it exists.
+如果返回头中存在 Last-Modified 属性，则返回它。
 
 #### res.lastModified=
 
-Set the Last-Modified header as an appropriate UTC string. You can either set it as a Date or date string.
+设置返回头中的 Last-Modified 属性，可以使用时间对象或者时间字符串。
 
 ````javascript
 this.response.lastModified = new Date();
@@ -742,7 +739,7 @@ this.response.lastModified = new Date();
 
 #### res.etag=
 
-Set the ETag of a response including the wrapped "s. Note that there is no corresponding res.etag getter.
+设置返回头的 Etag 字段。koa 不提供关于 Etag 的获取方法。
 
 ````javascript
 this.response.etag = crypto.createHash('md5').update(this.body).digest('hex');
