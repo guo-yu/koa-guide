@@ -1,4 +1,4 @@
-## ![koa](http://ww4.sinaimg.cn/large/61ff0de3gw1ebtqstxfuvj202g01awea.jpg) 中文文档 ![koa@npm](https://badge.fury.io/js/koa.png) &nbsp;&nbsp; [![Build Status](https://travis-ci.org/koajs/koa.png)](https://travis-ci.org/koajs/koa)
+## ![koa](http://ww4.sinaimg.cn/large/61ff0de3gw1ebtqstxfuvj202g01awea.jpg) 中文文档 ![koa@npm](https://badge.fury.io/js/koa.png) &nbsp; [![Build Status](https://travis-ci.org/koajs/koa.png)](https://travis-ci.org/koajs/koa)
 
 Koa，下一代 Node.js web 框架
 
@@ -28,7 +28,7 @@ alias node='node --harmony'
 
 一个 Koa Application（以下简称 app）由一系列 generator 中间件组成。按照编码顺序在栈内依次执行，从这个角度来看，Koa app 和其他中间件系统（比如 Ruby Rack 或者 Connect/Express ）没有什么太大差别，不过，从另一个层面来看，Koa 提供了一种基于底层中间件编写「语法糖」的设计思路，这让设计中间件变得更简单有趣。
 
-在这些中间件中，有负责内容协商（content-negotation），缓存控制（cache freshness），反向代理（proxy support）和重定向等等功能常用中间件（详见 [中间件](#%E4%B8%AD%E9%97%B4%E4%BB%B6middleware) 章节），但如前所述， Koa 内核并不会打包这些中间件，让我们先来看看 Koa 极其简单的 Hello World 应用程序：
+在这些中间件中，有负责内容协商（content-negotation）、缓存控制（cache freshness）、反向代理（proxy support）与重定向等等功能的常用中间件（详见 [中间件](#%E4%B8%AD%E9%97%B4%E4%BB%B6middleware) 章节），但如前所述， Koa 内核并不会打包这些中间件，让我们先来看看 Koa 极其简单的 Hello World 应用程序：
 
 ````javascript
 var koa = require('koa');
@@ -90,9 +90,7 @@ app.listen(3000);
 ````
 在上方的范例代码中，中间件以此被执行的顺序已经在注释中标记出来。你也可以自己尝试运行一下这个范例，并打印记录下各个环节的输出与耗时。
 
-**译者注：** 为什么是级联？
-
-「级联」这个词许多人也许在 CSS 中听说过，如果你不能理解为什么在这里使用这个词，可以将这种路由结构想象成 LESS 的继承嵌套书写方式：
+**译者注：** 「级联」这个词许多人也许在 CSS 中听说过，如果你不能理解为什么在这里使用这个词，可以将这种路由结构想象成 LESS 的继承嵌套书写方式：
 
 ````
 .middleware1 {
