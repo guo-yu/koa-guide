@@ -214,7 +214,7 @@ app.on('error', function(err, ctx){
 
 Koa 的上下文封装了 request 与 response 对象至一个对象中，并提供了一些帮助开发者编写业务逻辑的方法。为了方便，你可以在 `ctx.request` 和 `ctx.response` 中访问到这些方法。
 
-每一个请求都会创建一段上下文。在控制业务逻辑的中间件中，上下文被寄存在 `this` 对象中，你可以这样访问：
+每一个请求都会创建一段上下文。在控制业务逻辑的中间件中，上下文被寄存在 `this` 对象中：
 
 ````javascript
 app.use(function *(){
@@ -281,15 +281,19 @@ ctx.response 对象包括以下属性和别名方法，详见 [Response](#respon
 - ctx.res: Node.js 中的 response 对象
 - ctx.app: app 实例
 - ctx.cookies.get(name, [options]) 对于给定的 name ，返回响应的 cookie
+  - options
+    * `signed` [boolean]
 - ctx.cookies.set(name, value, [options]) 对于给定的参数，设置一个新 cookie
-    - options
-        * `signed`
-        * `expires`
-        * `path`
-        * `domain`
-        * `secure`
-        * `httpOnly`
-- ctx.throw(msg, [status]) 抛出常规错误的辅助方法，以下几种写法都有效：
+  - options
+      * `signed` [boolean]
+      * `expires` [date]
+      * `path` [string] 默认为 `'/'`
+      * `domain` [string]
+      * `secure` [boolean]
+      * `httpOnly` [boolean] 默认为 `true`
+- ctx.throw(msg, [status]) 抛出常规错误的辅助方法，默认 status 为 500。
+
+以下几种写法都有效：
 
 ````javascript
 this.throw(403)
@@ -298,7 +302,7 @@ this.throw(400, 'name required')
 this.throw('something exploded')
 ````
 
-实际上，ctx.throw 是这些代码片段的简写方法：
+实际上，`this.throw('name required', 400)` 是此代码片段的简写方法：
 
 ````javascript
 var err = new Error('name required');
@@ -306,19 +310,27 @@ err.status = 400;
 throw err;
 ````
 
-需要注意的是，ctx.throw 创建的错误，均为用户级别错误（标记为err.expose），会被返回到客户端。
+需要注意的是，`ctx.throw` 创建的错误，均为用户级别错误（标记为err.expose），会被返回到客户端。
+
+---
 
 ### Request
 
-`ctx.request` 对象是对 Node 原生请求对象的抽象包装，提供了一些非常有用的方法。详细的 Request 对象 API 如下：
+ctx.request 对象是对 Node 原生请求对象的抽象包装，提供了一些非常有用的方法。
+
+详细的 Request 对象 API 如下：
 
 #### req.header
 
+返回请求头
+
 #### req.method
+
+返回请求方法
 
 #### req.method=
 
-设置 req.method ，用于实现输入 methodOverride() 的中间件
+设置 req.method ，用于实现输入 `methodOverride()` 的中间件
 
 #### req.length
 
@@ -326,67 +338,126 @@ throw err;
 
 #### req.url
 
+返回请求 url
+
 #### req.url=
+
+设置请求 url，用于进行 url 重写
 
 #### req.path
 
+返回请求 pathname
+
 #### req.path=
+
+设置请求 pathname，如果原有 url 存在查询字符串，则保留这些查询。
 
 #### req.querystring
 
-返回类似 Express 中 req.query 查询字符串，去除了头部的 `'?'`
+返回 url 中的查询字符串，去除了头部的 `'?'`
 
 #### req.querystring=
 
+设置查询字符串，不包含 `'?'`
+
 #### req.search
 
-返回类似 Express 中 req.query 查询字符串，包含了头部的 `'?'`
+返回 url 中的查询字符串，包含了头部的 `'?'`
 
 #### req.search=
 
+设置查询字符串，包含 `'?'`
+
 #### req.host
+
+返回请求主机名，不包含端口；当 `app.proxy` 设置为 `true` 时，支持 `X-Forwarded-Host`。
 
 #### req.type
 
-返回 req 对象的 `Content-Type`
+返回 req 对象的 `Content-Type`，不包括 `charset` 属性，范例代码：
+
+````javascript
+var ct = this.type;
+// => "image/png"
+````
 
 #### req.query
 
-返回经过解析的查询字符串，类似 Express 中的 req.query
+返回经过解析的查询字符串，类似 Express 中的 req.query，当不存在查询字符串时，返回空对象。
+
+当 url 包含查询字符串 `"color=blue&size=small"` 时，返回如下：
+
+````javascript
+{
+  color: 'blue',
+  size: 'small'
+}
+````
 
 #### req.query=
 
+设置给定的对象为查询对象。范例代码如下：
+
+````javascript
+this.query = { next: '/login' };
+````
+
 #### req.fresh
 
-检查 req 的缓存是否是最新。当缓存为最新时，可编写业务逻辑直接返回 `304`
+检查客户端请求的缓存是否是最新。当缓存为最新时，可编写业务逻辑直接返回 `304`，范例代码如下：
+
+````javascript
+this.set('ETag', '123');
+
+// 当客户端缓存是最新时
+if (this.fresh) {
+  this.status = 304;
+  return;
+}
+
+// 当客户端缓存已过期时，返回最新的数据
+this.body = yield db.find('something');
+````
 
 #### req.stale
 
-和 req.fresh 返回的结果正好相反
+与 req.fresh 返回的结果正好相反
 
 #### req.protocol
 
+返回请求协议名，如 `"https"` 或者 `"http"`；当 `app.proxy` 设置为 `true` 时，支持 `X-Forwarded-Proto`。
+
 #### req.secure
+
+判断请求协议是否为 HTTPS 的快捷方法，等同于 `this.protocol == "https"`
 
 #### req.ip
 
+返回请求IP；当 `app.proxy` 设置为 `true` 时，支持 `X-Forwarded-For`。
+
 #### req.ips
+
+返回请求IP列表，仅当 `app.proxy` 设置为 `true` ，并存在 `X-Forwarded-For` 列表时，否则返回空数组。
 
 #### req.subdomains
 
-返回 req 对象中的子域名数组。
+返回请求对象中的子域名数组。子域名数组会自动由请求域名字符串中的 `.` 分割开，在没有设置自定义的 `app.subdomainOffset` 参数时，默认返回根域名之前的所有子域名数组。
+
+例如，当请求域名为 `"tobi.ferrets.example.com"` 时候，返回 `["ferrets", "tobi"]`，数组顺序是子代域名在前，孙代域名在后。
+
+此例中，如果设置了自定义的 `app.subdomainOffset` 为 `3`，将忽略三级域名，返回 `["tobi"]`。
 
 #### req.is(type)
 
-判断 req 对象中 Content-Type 是否为给定 type 的快捷方法：
+判断请求对象中 `Content-Type` 是否为给定 type 的快捷方法，如果不存在 `request.body`，将返回 `undefined`，如果没有符合的类型，返回 `false`，除此之外，返回匹配的类型字符串。
 
 ````javascript
-// With Content-Type: text/html; charset=utf-8
+// 客户端 Content-Type: text/html; charset=utf-8
 this.is('html'); // => 'html'
 this.is('text/html'); // => 'text/html'
 this.is('text/*', 'text/html'); // => 'text/html'
 
-// When Content-Type is application/json
+// 客户端 Content-Type 为 application/json 时：
 this.is('json', 'urlencoded'); // => 'json'
 this.is('application/json'); // => 'application/json'
 this.is('html', 'application/*'); // => 'application/json'
@@ -394,9 +465,19 @@ this.is('html', 'application/*'); // => 'application/json'
 this.is('html'); // => false
 ````
 
+又如，下方的代码使用 `req.is(type)`，仅当请求类型为图片时才进行操作：
+
+````javascript
+if (this.is('image/*')) {
+  // process
+} else {
+  this.throw(415, 'images only!');
+}
+````
+
 #### req.accepts(type)
 
-判断 req 对象中 Accept 是否为给定 type 的快捷方法：
+判断请求对象中 `Accept` 是否为给定 type 的快捷方法，当匹配到符合的类型时，返回最匹配的类型，否则返回 `false`（此时服务器端应当返回 406 "Not Acceptable" ），传入参数可以是字符串或者数组。
 
 ````javascript
 // Accept: text/html
@@ -424,9 +505,11 @@ this.accepts('html', 'json');
 // => "json"
 ````
 
+注意，当请求头中不包含 Accept 属性时，给定的第一个 type 将会被返回。
+
 #### req.acceptsEncodings(encodings)
 
-判断客户端是否接受给定的编码方式的快捷方法，当有传入参数时，返回最应当返回的一种编码方式
+判断客户端是否接受给定的编码方式的快捷方法，当有传入参数时，返回最应当返回的一种编码方式。
 
 ````javascript
 // Accept-Encoding: gzip
@@ -453,9 +536,217 @@ this.acceptsEncodings();
 
 使用方法同 req.acceptsEncodings(encodings)
 
+---
+
 ### Response
 
-详细的 Response 对象 API
+详细的 Response 对象 API 如下：
+
+#### res.header
+
+获取返回头
+
+#### res.status
+
+获取返回状态
+
+#### res.status=
+
+设置返回状态，可用状态如下：
+
+- 100 "continue"
+- 101 "switching protocols"
+- 102 "processing"
+- 200 "ok"
+- 201 "created"
+- 202 "accepted"
+- 203 "non-authoritative information"
+- 204 "no content"
+- 205 "reset content"
+- 206 "partial content"
+- 207 "multi-status"
+- 300 "multiple choices"
+- 301 "moved permanently"
+- 302 "moved temporarily"
+- 303 "see other"
+- 304 "not modified"
+- 305 "use proxy"
+- 307 "temporary redirect"
+- 400 "bad request"
+- 401 "unauthorized"
+- 402 "payment required"
+- 403 "forbidden"
+- 404 "not found"
+- 405 "method not allowed"
+- 406 "not acceptable"
+- 407 "proxy authentication required"
+- 408 "request time-out"
+- 409 "conflict"
+- 410 "gone"
+- 411 "length required"
+- 412 "precondition failed"
+- 413 "request entity too large"
+- 414 "request-uri too large"
+- 415 "unsupported media type"
+- 416 "requested range not satisfiable"
+- 417 "expectation failed"
+- 418 "i'm a teapot"
+- 422 "unprocessable entity"
+- 423 "locked"
+- 424 "failed dependency"
+- 425 "unordered collection"
+- 426 "upgrade required"
+- 428 "precondition required"
+- 429 "too many requests"
+- 431 "request header fields too large"
+- 500 "internal server error"
+- 501 "not implemented"
+- 502 "bad gateway"
+- 503 "service unavailable"
+- 504 "gateway time-out"
+- 505 "http version not supported"
+- 506 "variant also negotiates"
+- 507 "insufficient storage"
+- 509 "bandwidth limit exceeded"
+- 510 "not extended"
+- 511 "network authentication required"
+
+#### res.length=
+
+设置返回头的 `Content-Length` 属性
+
+#### res.length
+
+返回返回头的 `Content-Length` 属性，当不存在 `Content-Length` 属性时，根据 `res.body` 推断
+
+#### res.body
+
+获取 res.body，当 res.body 为 null ，但返回状态仍为 200 时，koa 将会返回 404 页面。
+
+#### res.body=
+
+设置请求返回的主要内容，可以是以下几种类型：
+
+- string
+
+  Content-Type 将默认设置为 text/html 或者 text/plain，默认字符集是 utf-8，Content-Length 也将一并设置
+
+- Buffer 
+
+  Content-Type 将默认设置为 application/octet-stream，Content-Length 也将一并设置
+
+- Stream
+
+  Content-Type 将默认设置为 application/octet-stream
+
+- Object
+
+  Content-Type 将默认设置为 application/json
+  注意：默认的json返回会添加空格，如果你希望压缩json返回中的空格，可以这样配置：`app.jsonSpaces = 0`
+
+- null
+
+#### res.get(field)
+
+Get a response header field value with case-insensitive field.
+
+````javascript
+var etag = this.get('ETag');
+````
+
+#### res.set(field, value)
+
+Set response header field to value:
+
+````javascript
+this.set('Cache-Control', 'no-cache');
+````
+
+#### res.set(fields)
+
+Set several response header fields with an object:
+
+````javascript
+this.set({
+  'Etag': '1234',
+  'Last-Modified': date
+});
+````
+
+#### res.remove(fields)
+
+Remove header field.
+
+#### res.type
+
+Get response Content-Type void of parameters such as "charset".
+
+````javascript
+var ct = this.type;
+// => "image/png"
+````
+
+#### res.type=
+
+Set response Content-Type via mime string or file extension.
+
+````javascript
+this.type = 'text/plain; charset=utf-8';
+this.type = 'image/png';
+this.type = '.png';
+this.type = 'png';
+````
+
+Note: when appropriate a charset is selected for you, for example res.type = 'html' will default to "utf-8", however when explicitly defined in full as res.type = 'text/html' no charset is assigned.
+
+#### res.redirect(url, [alt])
+
+Perform a [302] redirect to url.
+
+The string "back" is special-cased to provide Referrer support, when Referrer is not present alt or "/" is used.
+
+````javascript
+this.redirect('back');
+this.redirect('back', '/index.html');
+this.redirect('/login');
+this.redirect('http://google.com');
+````
+
+To alter the default status of 302, simply assign the status before or after this call. To alter the body, assign it after this call:
+
+````javascript
+this.status = 301;
+this.redirect('/cart');
+this.body = 'Redirecting to shopping cart';
+````
+
+#### res.attachment([filename])
+
+Set Content-Disposition to "attachment" to signal the client to prompt for download. Optionally specify the filename of the download.
+
+#### res.headerSent
+
+Check if a response header has already been sent. Useful for seeing if the client may be notified on error.
+
+#### res.lastModified
+
+Return the Last-Modified header as a Date, if it exists.
+
+#### res.lastModified=
+
+Set the Last-Modified header as an appropriate UTC string. You can either set it as a Date or date string.
+
+````javascript
+this.response.lastModified = new Date();
+````
+
+#### res.etag=
+
+Set the ETag of a response including the wrapped "s. Note that there is no corresponding res.etag getter.
+
+````javascript
+this.response.etag = crypto.createHash('md5').update(this.body).digest('hex');
+````
 
 ---
 
@@ -489,6 +780,21 @@ this.acceptsEncodings();
 4349.37
 ````
 一般来说，我们通常要使用约50个中间件，按这个标准计算，单应用可支持 340,260 请求/分钟，即 20,415,600 请求/小时，也就是约 4.4 亿 请求/天。
+
+---
+
+### 学习资料
+
+发现更多第三方的 koa 中间件，或者一起来参与社区的讨论和建设吧：
+
+- [GitHub repository](https://github.com/koajs/koa)
+- [Examples](https://github.com/koajs/examples)
+- [Middleware](https://github.com/koajs/koa/wiki)
+- [Wiki](https://github.com/koajs/koa/wiki)
+- [G+ Community](https://plus.google.com/communities/101845768320796750641)
+- [Mailing list](https://groups.google.com/forum/#!forum/koajs)
+- [Guide](https://github.com/koajs/koa/blob/master/docs/guide.md)
+- [FAQ](https://github.com/koajs/koa/blob/master/docs/faq.md)
 
 ---
 
