@@ -52,7 +52,7 @@ Koa 中间件以一种非常传统的方式级联起来，你可能会非常熟�
 
 下边这个例子展现了使用这一特殊方法书写的 Hello World 范例：一开始，用户的请求通过 x-response-time 中间件和 logging 中间件，这两个中间件记录了一些请求细节，然后「穿过」 response 中间件一次，最终结束请求，返回 「Hello World」。
 
-当程序运行到 `yield next` 时，代码流会暂停执行这个中间件的剩余代码，转而切换到下一个被定义的中间件执行代码，这样切换控制权的方式，被称为 
+当程序运行到 `yield next` 时，代码流会暂停执行这个中间件的剩余代码，转而切换到下一个被定义的中间件执行代码，这样切换控制权的方式，被称为
 downstream，当没有下一个中间件执行 downstream 的时候，代码将会逆序执行。
 
 ````javascript
@@ -107,6 +107,10 @@ app.listen(3000);
 }
 ````
 上方的伪代码中标注了中间件的执行顺序，看起来是不是有点像 ruby 执行代码块（block）时 yield 的表现了？也许这能帮助你更好的理解 koa 运作的方式。
+
+**译者注：** 更加形象的图可以参考 [Django Middleware](https://docs.djangoproject.com/en/1.6/topics/http/middleware/)
+
+![onion.png](https://raw.github.com/fengmk2/koa-guide/master/onion.png)
 
 ---
 
@@ -631,7 +635,7 @@ this.acceptsEncodings();
 
   Content-Type 将默认设置为 text/html 或者 text/plain，默认字符集是 utf-8，Content-Length 也将一并设置
 
-- Buffer 
+- Buffer
 
   Content-Type 将默认设置为 application/octet-stream，Content-Length 也将一并设置
 
@@ -688,7 +692,7 @@ var ct = this.type;
 
 #### res.type=
 
-使用字符串或者文件后缀设定返回的 Content-Type 
+使用字符串或者文件后缀设定返回的 Content-Type
 
 ````javascript
 this.type = 'text/plain; charset=utf-8';
@@ -701,7 +705,7 @@ this.type = 'png';
 
 #### res.redirect(url, [alt])
 
-返回一个 303 跳转到给定的 url，您也可以使用关键词 `back` 来跳转到该 url 的上一个页面（refer），当没有上一个页面时，默认会跳转到 '/'
+返回一个 `302` 跳转到给定的 url，您也可以使用关键词 `back` 来跳转到该 url 的上一个页面（refer），当没有上一个页面时，默认会跳转到 '/'
 
 ````javascript
 this.redirect('back');
@@ -709,7 +713,7 @@ this.redirect('back', '/index.html');
 this.redirect('/login');
 this.redirect('http://google.com');
 ````
-如果你需要覆盖 302 状态码，并在跳转时返回一些文案，可以这样做：
+如果你需要覆盖 `302` 状态码，并在跳转时返回一些文案，可以这样做：
 
 ````javascript
 this.status = 301;
