@@ -16,7 +16,7 @@ koa 依赖支持 generator 的 Node 环境，准确来说，是 `node >= 0.11.9`
 $ npm install koa
 ````
 
-安装完成后，应确保使用 `$ node app.js --harmony` 即，harmony 模式运行程序。
+安装完成后，应确保使用 `$ node --harmony app.js` 即，harmony 模式运行程序。
 
 为了方便，可以将 `node` 设置为默认启动 harmony 模式的别名：
 
