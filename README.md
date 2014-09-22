@@ -90,7 +90,7 @@ app.use(function *(){
 
 app.listen(3000);
 ````
-在上方的范例代码中，中间件以此被执行的顺序已经在注释中标记出来。你也可以自己尝试运行一下这个范例，并打印记录下各个环节的输出与耗时。
+在上方的范例代码中，中间件依次被执行的顺序已经在注释中标记出来。你也可以自己尝试运行一下这个范例，并打印记录下各个环节的输出与耗时。
 
 **译者注：** 「级联」这个词许多人也许在 CSS 中听说过，如果你不能理解为什么在这里使用这个词，可以将这种路由结构想象成 LESS 的继承嵌套书写方式：
 
@@ -188,7 +188,7 @@ http.createServer(app.callback()).listen(3001);
 app.keys = ['im a newer secret', 'i like turtle'];
 app.keys = new KeyGrip(['im a newer secret', 'i like turtle'], 'sha256');
 ````
-注意，签名密钥只在配置项 `signed` 参数为真是才会生效：
+注意，签名密钥只在配置项 `signed` 参数为真时才会生效：
 
 ````javascript
 this.cookies.set('name', 'tobi', { signed: true });
@@ -212,7 +212,7 @@ app.on('error', function(err, ctx){
 });
 ````
 
-如果任何错误有可能被回应到客户端，比如当没有新数据写入 socket 时，Koa 会默认返回一个 500 错误，并抛出一个 app 级别的错误到日志处理中间件中。
+任何错误有可能被回应到客户端，比如当没有新数据写入 socket 时，Koa 会默认返回一个 500 错误，并抛出一个 app 级别的错误到日志处理中间件中。
 
 ---
 
