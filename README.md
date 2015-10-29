@@ -127,8 +127,6 @@ app.listen(3000);
 - app.env 执行环境，默认是 `NODE_ENV` 或者 `"development"` 字符串
 - app.proxy 决定了哪些 `proxy header` 参数会被加到信任列表中
 - app.subdomainOffset 被忽略的 `.subdomains` 列表，详见下方 api
-- app.jsonSpaces 输出 json 时是否自动添加空格充当缩进，详见下方 api
-- app.outputErrors 是否输出错误堆栈（`err.stack`）到 `stderr` [当执行环境是 `"test"` 的时候为 `false`]
 
 ---
 
