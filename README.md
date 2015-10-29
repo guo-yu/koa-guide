@@ -10,13 +10,15 @@ Koa，下一代 Node.js web 框架
 
 ### 安装 koa
 
-koa 依赖支持 generator 的 Node 环境，准确来说，是 `node >= 0.11.9` 的环境。
+koa 依赖支持 generator 的 Node 环境，准确来说，是 `node >= 0.11.9` 的环境。如果你正在使用一个更早的 Node 版本，可以使用模块 `n` 来管理多版本环境，并且快速安装 `0.11.x`:
 
-````
-$ npm install koa
-````
+```bash
+$ npm install -g n
+$ n 0.11
+$ node --harmony my-koa-app.js
+```
 
-安装完成后，应确保使用 `$ node app.js --harmony` 即，harmony 模式运行程序。
+安装完成后，应确保使用 `$ node --harmony app.js` 即，harmony 模式运行程序。
 
 为了方便，可以将 `node` 设置为默认启动 harmony 模式的别名：
 
@@ -42,11 +44,12 @@ app.use(function *(){
 
 app.listen(3000);
 ````
-**译者注：** 与普通的 function 不同，generator functions 以 `function*` 声明。以这种关键词声明的函数支持 `yield`
+
+**译者注：** 与普通的 function 不同，generator functions 以 `function*` 声明，以这种关键词声明的函数支持 `yield`。generator function是ECMAScript 6定义的新的语法，想了解其基本用法，以及Koa如何利用generator function达到在保持js代码异步特性的同时无需编写大量回调函数，可以参考[这篇文章](http://blog.stevensanderson.com/2013/12/21/experiments-with-koa-and-javascript-generators/)。
 
 ---
 
-### 编写级联代码（Cascading）
+### 级联代码（Cascading）
 
 Koa 中间件以一种非常传统的方式级联起来，你可能会非常熟悉这种写法。
 
@@ -90,7 +93,7 @@ app.use(function *(){
 
 app.listen(3000);
 ````
-在上方的范例代码中，中间件以此被执行的顺序已经在注释中标记出来。你也可以自己尝试运行一下这个范例，并打印记录下各个环节的输出与耗时。
+在上方的范例代码中，中间件依次被执行的顺序已经在注释中标记出来。你也可以自己尝试运行一下这个范例，并打印记录下各个环节的输出与耗时。
 
 **译者注：** 「级联」这个词许多人也许在 CSS 中听说过，如果你不能理解为什么在这里使用这个词，可以将这种路由结构想象成 LESS 的继承嵌套书写方式：
 
@@ -188,7 +191,7 @@ http.createServer(app.callback()).listen(3001);
 app.keys = ['im a newer secret', 'i like turtle'];
 app.keys = new KeyGrip(['im a newer secret', 'i like turtle'], 'sha256');
 ````
-注意，签名密钥只在配置项 `signed` 参数为真是才会生效：
+注意，签名密钥只在配置项 `signed` 参数为真时才会生效：
 
 ````javascript
 this.cookies.set('name', 'tobi', { signed: true });
@@ -212,7 +215,7 @@ app.on('error', function(err, ctx){
 });
 ````
 
-如果任何错误有可能被回应到客户端，比如当没有新数据写入 socket 时，Koa 会默认返回一个 500 错误，并抛出一个 app 级别的错误到日志处理中间件中。
+任何错误有可能被回应到客户端，比如当没有新数据写入 socket 时，Koa 会默认返回一个 500 错误，并抛出一个 app 级别的错误到日志处理中间件中。
 
 ---
 
@@ -833,4 +836,5 @@ THE SOFTWARE.
 
 ---
 ![docor](https://cdn1.iconfinder.com/data/icons/windows8_icons_iconpharm/26/doctor.png)
-generated using [docor](https://github.com/turingou/docor.git) @ 0.1.0. brought to you by [turingou](https://github.com/turingou)
+
+Generated using [docor](https://github.com/guo-yu/docor.git) @ 0.1.0. brought to you by [Guo Yu](https://github.com/guo-yu)
