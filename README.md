@@ -295,8 +295,13 @@ ctx.response 对象包括以下属性和别名方法，详见 [Response](#respon
 #### 上下文对象中的其他 API
 
 - ctx.req: Node.js 中的 request 对象
-- ctx.res: Node.js 中的 response 对象
+- ctx.res: Node.js 中的 response 对象，方法有:
+  - res.statusCode
+  - res.writeHead()
+  - res.write()
+  - res.end()
 - ctx.app: app 实例
+- ctx.state: 推荐的命名空间，用来保存那些通过中间件传递给试图的参数或数据。比如 `this.state.user = yield User.find(id);`
 - ctx.cookies.get(name, [options]) 对于给定的 name ，返回响应的 cookie
   - options
     * `signed` [boolean]
@@ -328,6 +333,8 @@ throw err;
 ````
 
 需要注意的是，`ctx.throw` 创建的错误，均为用户级别错误（标记为err.expose），会被返回到客户端。
+
+- ctx.assert(value, [msg], [status], [properties]) 用来断言的辅助方法，类似 Node 中的 `assert()` 方法。`this.assert(this.user, 401, 'User not found. Please login!');` 此方法由 `http-assert` 模块支持。
 
 ---
 
