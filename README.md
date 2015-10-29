@@ -158,17 +158,26 @@ app.listen(3000);
 ````javascript
 var koa = require('koa');
 var app = koa();
+
 app.listen(3000);
 ````
 app.listen 是 http.createServer 的简单包装，它实际上这样运行：
 
 ````javascript
+var http = require('http');
+var koa = require('koa');
+var app = koa();
+
 http.createServer(app.callback()).listen(3000);
 ````
 
 如果有需要，你可以在多个端口上启动一个 app，比如同时支持 HTTP 和 HTTPS：
 
 ````javascript
+var http = require('http');
+var koa = require('koa');
+var app = koa();
+
 http.createServer(app.callback()).listen(3000);
 http.createServer(app.callback()).listen(3001);
 ````
@@ -197,7 +206,7 @@ this.cookies.set('name', 'tobi', { signed: true });
 
 ### 错误处理（Error Handling）
 
-除非应用执行环境被配置为 `"test"`，Koa 都将会将所有错误信息输出到 stderr，和 Connect 一样，你可以自己定义一个「错误事件」来监听 Koa app 中发生的错误：
+除非 `NODE_ENV` 被配置为 `"test"`，Koa 都将会将所有错误信息输出到 `stderr`，也可以自定义「错误事件」来监听 Koa app 中发生的错误，比如记录错误日志：
 
 ````javascript
 app.on('error', function(err){
@@ -205,7 +214,7 @@ app.on('error', function(err){
 });
 ````
 
-当任何 req 或者 res 中出现的错误无法被回应到客户端时，Koa 会在第二个参数传入这个错误的上下文：
+当任何 `req` 或者 `res` 中出现的错误无法被回应到客户端时，Koa 会在第二个参数传入这个错误的上下文：
 
 ````javascript
 app.on('error', function(err, ctx){
@@ -230,6 +239,7 @@ app.use(function *(){
   this.response; // Response 对象
 });
 ````
+为了使用方便，许多上下文属性和方法都被委托代理到他们的 `ctx.request` 或 `ctx.response`，比如访问 `ctx.type` 和 `ctx.length` 将被代理到 `response` 对象，`ctx.path` 和 `ctx.method` 将被代理到 `request` 对象。
 
 #### Request 对象
 
