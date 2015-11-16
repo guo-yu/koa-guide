@@ -45,6 +45,19 @@ app.use(function *(){
 app.listen(3000);
 ````
 
+如果使用Koa 2的话：
+
+````javascript
+var Koa = require('koa');
+var app = new Koa();
+
+app.use(ctx => {
+  ctx.body = 'Hello World';
+});
+
+app.listen(3000);
+````
+
 **译者注：** 与普通的 function 不同，generator functions 以 `function*` 声明，以这种关键词声明的函数支持 `yield`。generator function是ECMAScript 6定义的新的语法，想了解其基本用法，以及Koa如何利用generator function达到在保持js代码异步特性的同时无需编写大量回调函数，可以参考[这篇文章](http://blog.stevensanderson.com/2013/12/21/experiments-with-koa-and-javascript-generators/)。
 
 ---
