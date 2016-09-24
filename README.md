@@ -14,7 +14,7 @@ koa 依赖支持 generator 的 Node 环境，准确来说，是 `node >= 0.11.9`
 
 ```bash
 $ npm install -g n
-$ n 0.11
+$ n 0.11发
 $ node --harmony my-koa-app.js
 ```
 
@@ -314,7 +314,7 @@ ctx.response 对象包括以下属性和别名方法，详见 [Response](#respon
   - res.write()
   - res.end()
 - ctx.app: app 实例
-- ctx.state: 推荐的命名空间，用来保存那些通过中间件传递给试图的参数或数据。比如 `this.state.user = yield User.find(id);`
+- ctx.state: 推荐的命名空间，用来保存那些通过中间件传递给视图的参数或数据。比如 `this.state.user = yield User.find(id);`
 - ctx.cookies.get(name, [options]) 对于给定的 name ，返回响应的 cookie
   - options
     * `signed` [boolean]
