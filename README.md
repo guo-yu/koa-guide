@@ -14,7 +14,7 @@ koa 依赖支持 generator 的 Node 环境，准确来说，是 `node >= 0.11.9`
 
 ```bash
 $ npm install -g n
-$ n 0.11发
+$ n 0.11
 $ node --harmony my-koa-app.js
 ```
 
