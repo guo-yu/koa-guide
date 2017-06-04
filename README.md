@@ -20,7 +20,7 @@ $ npm i koa
 $ node my-koa-app.js
 ```
 
-使用Babel来支持Async Functions 
+###### 使用Babel来支持Async Functions 
 
 在node 7.6版本以下，如果你想在koa使用`async` functions，我们推荐使[babel](http://babeljs.io/docs/usage/require/)
 ````
