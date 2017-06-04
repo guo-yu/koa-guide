@@ -22,7 +22,7 @@ $ node my-koa-app.js
 
 ###### 使用Babel来支持Async Functions 
 
-在node 7.6版本以下，如果你想在koa使用`async` functions，我们推荐使[babel](http://babeljs.io/docs/usage/require/)
+在node 7.6版本以下，如果你想在koa里使用`async` functions，我们推荐[babel](http://babeljs.io/docs/usage/require/)
 ````
 require('babel-core/register');
 // require the rest of the app that needs to be transpiled after the hook
