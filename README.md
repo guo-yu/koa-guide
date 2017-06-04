@@ -10,21 +10,34 @@ Koa，下一代 Node.js web 框架
 
 ### 安装 koa
 
-koa 依赖支持 generator 的 Node 环境，准确来说，是 `node >= 0.11.9` 的环境。如果你正在使用一个更早的 Node 版本，可以使用模块 `n` 来管理多版本环境，并且快速安装 `0.11.x`:
+Koa需要支持ES2015和`async` function的node v7.6.0或更高版本。
+
+您可以使用喜欢的依赖管理工具快速安装支持的node版本：
 
 ```bash
-$ npm install -g n
-$ n 0.11
-$ node --harmony my-koa-app.js
+$ nvm install 7
+$ npm i koa
+$ node my-koa-app.js
 ```
 
-安装完成后，应确保使用 `$ node --harmony app.js` 即，harmony 模式运行程序。
+使用Babel来支持Async Functions 
 
-为了方便，可以将 `node` 设置为默认启动 harmony 模式的别名：
+在node 7.6版本以下，如果你想在koa使用`async` functions，我们推荐使[babel](http://babeljs.io/docs/usage/require/)
+````
+require('babel-core/register');
+// require the rest of the app that needs to be transpiled after the hook
+const app = require('./app');
+````
 
-````
-alias node='node --harmony'
-````
+你至少要使用[transform-async-to-generator](http://babeljs.io/docs/plugins/transform-async-to-generator/) or [transform-async-to-module-method](http://babeljs.io/docs/plugins/transform-async-to-module-method/)插件，
+来解析和转译async functions。例如，你可以在你的`.babelrc`文件里这样写：
+```json
+{
+  "plugins": ["transform-async-to-generator"]
+}
+```
+
+你也可以在[env preset](http://babeljs.io/docs/plugins/preset-env/)里使用目标选项`"node": "current"`。
 
 ---
 
