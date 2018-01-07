@@ -201,11 +201,12 @@ http.createServer(app.callback()).listen(3000);
 
 ````javascript
 var http = require('http');
+var https = require('https');
 var koa = require('koa');
 var app = koa();
 
 http.createServer(app.callback()).listen(3000);
-http.createServer(app.callback()).listen(3001);
+https.createServer(app.callback()).listen(3001);
 ````
 
 #### app.callback()
